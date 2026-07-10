@@ -1,0 +1,98 @@
+/* Styles applicatifs — Plateforme de Suivi Académique */
+
+:root {
+    --c-primary: #2b6cb0;
+    --c-primary-dark: #1a4971;
+    --c-success: #2f855a;
+    --c-warning: #d69e2e;
+    --c-danger: #c53030;
+    --c-faible: #38a169;
+    --c-modere: #d69e2e;
+    --c-eleve: #c53030;
+}
+
+body {
+    background-color: #f7fafc;
+    min-height: 100vh;
+}
+
+[data-bs-theme="dark"] body { background-color: #1a202c; }
+
+/* Cartes KPI */
+.kpi-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.kpi-card .kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.kpi-card .kpi-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #718096;
+}
+
+/* Badges de niveau de risque */
+.badge-risque-Faible  { background-color: var(--c-faible); color: #fff; }
+.badge-risque-Modere  { background-color: var(--c-modere); color: #fff; }
+.badge-risque-Eleve   { background-color: var(--c-eleve); color: #fff; }
+
+/* Barre de progression crédits */
+.progress-credits {
+    height: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+/* Carte alerte */
+.alert-card {
+    border-left: 4px solid var(--c-warning);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: #fff;
+}
+.alert-card.eleve  { border-left-color: var(--c-eleve); }
+.alert-card.modere { border-left-color: var(--c-modere); }
+.alert-card.faible { border-left-color: var(--c-faible); }
+
+[data-bs-theme="dark"] .alert-card { background: #2d3748; }
+
+/* Sidebar/section titres */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--c-primary-dark);
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+[data-bs-theme="dark"] .section-title { color: #90cdf4; border-bottom-color: #4a5568; }
+
+/* Connexion */
+.login-card {
+    max-width: 420px;
+    margin: 3rem auto;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* DataTables : dense */
+table.dataTable thead th { font-size: 0.85rem; }
+table.dataTable tbody td { font-size: 0.9rem; }
+
+/* Étiquette projection diplomation */
+.projection-date {
+    font-family: monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres d'alerte — Administration{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-gear text-primary me-2"></i>Paramètres d'alerte</h1>
+
+{# Référence : formule du score de risque (Eq 2.1) #}
+<div class="card shadow-sm mb-4 border-start border-4 border-primary">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-calculator me-2"></i>Formule du score de risque (Eq 2.1)</h2>
+    <p class="lead mb-1">
+      <code>ScoreRisque = 0,40×N + 0,30×C + 0,20×U + 0,10×A</code>
+    </p>
+    <p class="text-muted small mb-0">
+      N = note normalisée · C = crédits · U = UE en échec · A = absentéisme.
+      La somme des pondérations doit être égale à <strong>1,0</strong>.
+    </p>
+  </div>
+</div>
+
+<form method="post" action="{% url 'dashboards:admin_parametres' %}">
+  {% csrf_token %}
+
+  {# Seuils de déclenchement #}
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="section-title"><i class="bi bi-sliders me-2"></i>Seuils de déclenchement</h2>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Seuil « Faible » (score ≤)</label>
+          <div class="input-group">
+            <input type="number" step="0.1" min="0" max="100"
+                   class="form-control" name="seuil_faible"
+                   value="{{ params.seuil_faible }}" required>
+            <span class="input-group-text">/100</span>
+          </div>
+          <small class="text-muted">En dessous de ce score, le risque est jugé Faible.</small>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Seuil « Modéré » (score ≤)</label>
+          <div class="input-group">
+            <input type="number" step="0.1" min="0" max="100"
+                   class="form-control" name="seuil_modere"
+                   value="{{ params.seuil_modere }}" required>
+            <span class="input-group-text">/100</span>
+          </div>
+          <small class="text-muted">Au-dessus de ce seuil, le risque est jugé Élevé.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Pondérations (somme = 1.0) #}
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="section-title">
+        <i class="bi bi-percent me-2"></i>Pondérations
+        <span id="sumBadge" class="badge bg-secondary ms-2">somme = —</span>
+      </h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Notes (N)</label>
+          <input type="number" step="0.01" min="0" max="1" class="form-control pond"
+                 name="pond_notes" value="{{ params.ponderation_notes }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Crédits (C)</label>
+          <input type="number" step="0.01" min="0" max="1" class="form-control pond"
+                 name="pond_credits" value="{{ params.ponderation_credits }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">UE en échec (U)</label>
+          <input type="number" step="0.01" min="0" max="1" class="form-control pond"
+                 name="pond_ue" value="{{ params.ponderation_ue_echec }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Absentéisme (A)</label>
+          <input type="number" step="0.01" min="0" max="1" class="form-control pond"
+                 name="pond_abs" value="{{ params.ponderation_absenteisme }}" required>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div id="sumBar" class="progress" style="height: 6px;">
+          <div id="sumProgressBar" class="progress-bar bg-success" style="width: 100%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" id="btnSave" class="btn btn-primary">
+      <i class="bi bi-save me-1"></i>Enregistrer les paramètres
+    </button>
+    <a href="{% url 'dashboards:admin_parametres' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser
+    </a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  function majSomme() {
+    var sum = 0;
+    $('.pond').each(function () { sum += parseFloat($(this).val()) || 0; });
+    var badge = $('#sumBadge');
+    badge.text('somme = ' + sum.toFixed(2));
+    if (Math.abs(sum - 1.0) < 0.001) {
+      badge.removeClass('bg-danger bg-warning').addClass('bg-success');
+      $('#sumProgressBar').removeClass('bg-danger bg-warning').addClass('bg-success');
+      $('#btnSave').prop('disabled', false);
+    } else {
+      badge.removeClass('bg-success bg-warning').addClass('bg-danger');
+      $('#sumProgressBar').removeClass('bg-success bg-warning').addClass('bg-danger');
+      $('#btnSave').prop('disabled', true);
+    }
+    $('#sumProgressBar').css('width', Math.min(100, sum * 100) + '%');
+  }
+  $('.pond').on('input', majSomme);
+  majSomme();
+});
+</script>
+{% endblock %}

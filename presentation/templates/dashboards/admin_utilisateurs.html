@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateurs — Administration{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-people-gear text-primary me-2"></i>Gestion des utilisateurs</h1>
+  <a href="/admin/accounts/utilisateur/add/" class="btn btn-primary">
+    <i class="bi bi-person-plus me-1"></i>Nouvel utilisateur
+  </a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <table class="table table-striped" id="tableUsers">
+      <thead>
+        <tr>
+          <th>Identifiant</th>
+          <th>Nom complet</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in utilisateurs %}
+          <tr>
+            <td><code>{{ u.username }}</code></td>
+            <td>{{ u.get_full_name|default:"—" }}</td>
+            <td>{{ u.email|default:"—" }}</td>
+            <td>
+              <span class="badge
+                {% if u.role == 'administrateur' %}bg-danger
+                {% elif u.role == 'responsable' %}bg-primary
+                {% elif u.role == 'enseignant' %}bg-info
+                {% else %}bg-secondary{% endif %}">
+                {{ u.get_role_display|default:u.role }}
+              </span>
+            </td>
+            <td>
+              {% if u.is_active %}
+                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Actif</span>
+              {% else %}
+                <span class="badge bg-secondary"><i class="bi bi-slash-circle"></i> Inactif</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">Aucun utilisateur enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () { initDataTable('#tableUsers', { order: [[1, 'asc']] }); });
+</script>
+{% endblock %}

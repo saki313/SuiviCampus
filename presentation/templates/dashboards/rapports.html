@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports — Suivi Académique{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i>Rapports & exports</h1>
+
+{# Filtres communs — câblés aux exports via JS (soumet les query params) #}
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-funnel me-2"></i>Filtres du rapport</h2>
+    <form id="formFiltres" method="get" class="row g-3 align-items-end">
+      <div class="col-md-6">
+        <label class="form-label">Filière</label>
+        <select name="filiere" id="filtreFiliere" class="form-select">
+          <option value="">Toutes</option>
+          <option>Informatique</option>
+          <option>Mathématiques</option>
+          <option>Génie Logiciel</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Niveau LMD</label>
+        <select name="niveau" id="filtreNiveau" class="form-select">
+          <option value="">Tous</option>
+          <option value="L1">Licence 1</option>
+          <option value="L2">Licence 2</option>
+          <option value="L3">Licence 3</option>
+          <option value="M1">Master 1</option>
+          <option value="M2">Master 2</option>
+        </select>
+      </div>
+    </form>
+    <p class="text-muted small mt-2 mb-0">
+      <i class="bi bi-info-circle me-1"></i>
+      Les filtres s'appliquent aux trois formats d'export ci-dessous.
+    </p>
+  </div>
+</div>
+
+{# Cartes d'export #}
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100 text-center">
+      <div class="card-body">
+        <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 3rem;"></i>
+        <h2 class="h5 mt-2">Rapport PDF</h2>
+        <p class="text-muted small">Synthèse académique mise en page (3 pages : KPI, étudiants, UE critiques), prête à imprimer.</p>
+        <a href="{% url 'dashboards:rapport_pdf' %}" id="lienPdf" class="btn btn-danger">
+          <i class="bi bi-download me-1"></i>Télécharger PDF
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100 text-center">
+      <div class="card-body">
+        <i class="bi bi-file-earmark-excel text-success" style="font-size: 3rem;"></i>
+        <h2 class="h5 mt-2">Export Excel</h2>
+        <p class="text-muted small">Tableur détaillé (3 feuilles : synthèse, résultats par UE, alertes actives).</p>
+        <a href="{% url 'dashboards:rapport_excel' %}" id="lienExcel" class="btn btn-success">
+          <i class="bi bi-download me-1"></i>Télécharger Excel
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100 text-center">
+      <div class="card-body">
+        <i class="bi bi-filetype-csv text-secondary" style="font-size: 3rem;"></i>
+        <h2 class="h5 mt-2">Export CSV</h2>
+        <p class="text-muted small">Données brutes des indicateurs par étudiant (18 colonnes), pour réintégration externe.</p>
+        <a href="{% url 'dashboards:rapport_csv' %}" id="lienCsv" class="btn btn-secondary">
+          <i class="bi bi-download me-1"></i>Télécharger CSV
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-success mt-4">
+  <i class="bi bi-check-circle me-2"></i>
+  Les exports sont opérationnels (Phase 12). Les données sont générées à la demande à partir du Data Warehouse.
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  // Injecte les filtres dans les liens de téléchargement au changement
+  function majLiens() {
+    var params = new URLSearchParams();
+    var filiere = $('#filtreFiliere').val();
+    var niveau = $('#filtreNiveau').val();
+    if (filiere) params.set('filiere', filiere);
+    if (niveau) params.set('niveau', niveau);
+    var qs = params.toString();
+    var suffixe = qs ? '?' + qs : '';
+    $('#lienPdf').attr('href', '{% url "dashboards:rapport_pdf" %}' + suffixe);
+    $('#lienExcel').attr('href', '{% url "dashboards:rapport_excel" %}' + suffixe);
+    $('#lienCsv').attr('href', '{% url "dashboards:rapport_csv" %}' + suffixe);
+  }
+  $('#filtreFiliere, #filtreNiveau').on('change', majLiens);
+  // Restaure les filtres depuis l'URL courante
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('filiere')) $('#filtreFiliere').val(urlParams.get('filiere'));
+  if (urlParams.get('niveau')) $('#filtreNiveau').val(urlParams.get('niveau'));
+  majLiens();
+});
+</script>
+{% endblock %}

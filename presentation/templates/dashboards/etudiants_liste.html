@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des étudiants{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-people text-primary me-2"></i>Liste des étudiants</h1>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <table class="table table-striped" id="tableEtudiants">
+      <thead>
+        <tr>
+          <th>Matricule</th>
+          <th>Nom</th>
+          <th>Niveau</th>
+          <th>Filière</th>
+          <th>Score risque</th>
+          <th>Niveau</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for etu, indic in etudiants %}
+          <tr>
+            <td><code>{{ etu.matricule }}</code></td>
+            <td>{{ etu.utilisateur.get_full_name|default:etu.matricule }}</td>
+            <td>{{ etu.niveau|default:"—" }}</td>
+            <td>{{ etu.filiere|default:"—" }}</td>
+            <td data-score="{{ indic.score_risque|default:'' }}">
+              {% if indic and indic.score_risque is not None %}{{ indic.score_risque|floatformat:0 }}/100{% else %}—{% endif %}
+            </td>
+            <td data-niveau="{{ indic.classification_risque|default:'' }}">
+              {{ indic.classification_risque|default:"—" }}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted">Aucun étudiant enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  initDataTable('#tableEtudiants', { order: [[4, 'desc']] });
+  // Remplace la colonne "Niveau" par un badge coloré
+  $('#tableEtudiants tbody td[data-niveau]').each(function () {
+    var n = $(this).data('niveau');
+    if (n) $(this).html(window.risqueBadge(n));
+  });
+});
+</script>
+{% endblock %}

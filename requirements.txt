@@ -1,0 +1,29 @@
+# ============================================================
+# Dépendances Python — Plateforme de Suivi Académique
+# Installer avec : pip install -r requirements.txt
+# ============================================================
+
+# --- Backend ---
+Django>=5.0,<5.2
+djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3          # Authentification JWT (BF12)
+dj-database-url>=2.2                         # Parsing DATABASE_URL
+python-decouple>=3.8                         # Lecture .env
+django-filter>=24.2                          # Filtres API
+django-cors-headers>=4.4                     # CORS (interopérabilité BF compatibilité)
+
+# --- Documentation API ---
+drf-spectacular>=0.27                        # OpenAPI / Swagger UI
+
+# --- Base de données ---
+psycopg[binary]>=3.2,<4                      # Pilote PostgreSQL 16
+
+# --- Analytique / Data Warehouse ---
+pandas>=2.2                                  # Traitements analytiques (cohérent mémoire §2.3)
+
+# --- Rapports (BF08) ---
+reportlab>=4.2                               # Génération PDF
+openpyxl>=3.1                                # Génération Excel
+
+# --- Serveur de production ---
+gunicorn>=22.0

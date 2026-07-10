@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Mes alertes — {{ etudiant.matricule }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1"><i class="bi bi-bell text-primary me-2"></i>Mes alertes</h1>
+    <p class="text-muted mb-0">
+      {{ etudiant.utilisateur.get_full_name|default:etudiant.matricule }}
+      — <span class="badge bg-secondary">{{ etudiant.matricule }}</span>
+    </p>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <table class="table table-striped" id="tableAlertes">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Niveau</th>
+          <th>Message</th>
+          <th>Recommandation</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in alertes %}
+          <tr>
+            <td data-order="{{ a.created_at|date:"U" }}">{{ a.created_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ a.get_type_display|default:a.type }}</td>
+            <td data-niveau="{{ a.niveau_risque|default:'' }}">{{ a.niveau_risque|default:"—" }}</td>
+            <td>{{ a.message|default:"—" }}</td>
+            <td>
+              {% for reco in a.recommandations.all %}
+                <div class="small">
+                  <span class="badge bg-secondary">{{ reco.priorite }}</span>
+                  {{ reco.description|default:"—" }}
+                </div>
+              {% empty %}
+                <span class="text-muted">—</span>
+              {% endfor %}
+            </td>
+            <td>
+              <span class="badge {% if a.statut == 'Active' %}bg-danger{% elif a.statut == 'Traitee' %}bg-success{% else %}bg-secondary{% endif %}">
+                {{ a.get_statut_display|default:a.statut }}
+              </span>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted">Aucune alerte enregistrée.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  var table = initDataTable('#tableAlertes', { order: [[0, 'desc']] });
+  // Remplace les cellules "Niveau" par des badges colorés
+  $('#tableAlertes tbody td[data-niveau]').each(function () {
+    var n = $(this).data('niveau');
+    if (n) $(this).html(window.risqueBadge(n));
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Mon tableau de bord — {{ etudiant.matricule }}{% endblock %}
+
+{% block content %}
+{# Bandeau identité étudiant #}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">
+      <i class="bi bi-person-badge text-primary me-2"></i>
+      {{ etudiant.utilisateur.get_full_name|default:etudiant.matricule }}
+    </h1>
+    <p class="text-muted mb-0">
+      <span class="badge bg-secondary me-1">{{ etudiant.matricule }}</span>
+      <span class="badge bg-info me-1">{{ etudiant.niveau }}</span>
+      {% if etudiant.filiere %}<span class="badge bg-light text-dark border">{{ etudiant.filiere }}</span>{% endif %}
+    </p>
+  </div>
+  <span id="badgeRisque">{{ niveau_risque|default:"—" }}</span>
+</div>
+
+{# Ligne KPI #}
+<div class="row g-3 mb-4">
+  {# Score de risque #}
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Score de risque</div>
+        <div class="kpi-value text-primary">
+          <span id="kpiScore">{{ score|default:"—" }}</span><span class="fs-5">/100</span>
+        </div>
+        <div id="kpiRisqueBadge" class="mt-1"></div>
+      </div>
+    </div>
+  </div>
+
+  {# Progression #}
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Progression</div>
+        <div class="kpi-value text-success">{{ indicateurs.taux_progression|default:"—" }}<span class="fs-5"> %</span></div>
+        <small class="text-muted">Crédits / curriculum</small>
+      </div>
+    </div>
+  </div>
+
+  {# Crédits avec barre de progression #}
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Crédits acquis</div>
+        <div class="kpi-value">
+          {{ indicateurs.credits_acquis|default:"0" }}<span class="fs-5 text-muted">/{{ indicateurs.credits_total|default:"—" }}</span>
+        </div>
+        <div class="progress progress-credits mt-2">
+          <div id="barCredits" class="progress-bar bg-success"
+               data-acquis="{{ indicateurs.credits_acquis|default:'' }}"
+               data-total="{{ indicateurs.credits_total|default:'' }}"
+               style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Moyenne générale #}
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Moyenne générale</div>
+        <div class="kpi-value text-info">
+          {{ indicateurs.moyenne_generale|default:"—" }}<span class="fs-5">/20</span>
+        </div>
+        <small class="text-muted">Absentéisme : {{ indicateurs.taux_absenteisme|default:"—" }} %</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Projection de diplomation #}
+{% if indicateur_obj %}
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-calendar-check me-2"></i>Projection de diplomation</h2>
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <p class="mb-1 text-muted">Diplomation estimée</p>
+        <p class="projection-date mb-0">
+          {% if indicateur_obj.proj_diplomation %}{{ indicateur_obj.proj_diplomation|date:"d/m/Y" }}{% else %}—{% endif %}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p class="mb-1 text-muted">Semestres restants estimés</p>
+        <p class="h4 mb-0">{{ indicateur_obj.semestres_restants|default:"—" }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-3">
+  {# Mes alertes actives #}
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="section-title"><i class="bi bi-bell me-2"></i>Mes alertes actives</h2>
+        {% for alerte in alertes %}
+          <div class="alert-card {{ alerte.niveau_risque|lower }}">
+            <div class="d-flex justify-content-between">
+              <strong>{{ alerte.get_type_display|default:alerte.type }}</strong>
+              <small class="text-muted">{{ alerte.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            <p class="mb-0 mt-1">{{ alerte.message|default:"—" }}</p>
+          </div>
+        {% empty %}
+          <p class="text-muted mb-0"><i class="bi bi-check-circle me-1"></i>Aucune alerte active.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {# UE en échec #}
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="section-title"><i class="bi bi-exclamation-octagon me-2"></i>UE en échec</h2>
+        {% if ue_echecs %}
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-0">
+            <thead>
+              <tr>
+                <th>UE</th><th>Intitulé</th><th>Note</th><th>Semestre</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in ue_echecs %}
+                <tr>
+                  <td><code>{{ r.ue.code }}</code></td>
+                  <td>{{ r.ue.intitule }}</td>
+                  <td><span class="text-danger fw-bold">{{ r.note|default:"—" }}/20</span></td>
+                  <td>{{ r.semestre|default:"—" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p class="text-muted mb-0"><i class="bi bi-check-circle me-1"></i>Aucune UE en échec.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  // Badge dynamique du niveau de risque
+  var niveau = "{{ niveau_risque|default:'' }}";
+  if (niveau) {
+    $('#kpiRisqueBadge').html(window.risqueBadge(niveau));
+    $('#badgeRisque').replaceWith(window.risqueBadge(niveau));
+  }
+  // Barre de progression des crédits (robuste aux valeurs nulles)
+  var bar = $('#barCredits');
+  var acq = parseFloat(bar.data('acquis'));
+  var tot = parseFloat(bar.data('total'));
+  if (!isNaN(acq) && !isNaN(tot) && tot > 0) {
+    bar.css('width', Math.min(100, (acq / tot) * 100) + '%');
+  } else {
+    bar.css('width', '0%');
+  }
+});
+</script>
+{% endblock %}

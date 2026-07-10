@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Pilotage — Tableau de bord responsable{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-1"><i class="bi bi-clipboard-data text-primary me-2"></i>Pilotage de la promotion</h1>
+<p class="text-muted mb-4">
+  Filtres appliqués —
+  Filière : <strong>{{ filiere|default:"Toutes" }}</strong> ·
+  Niveau : <strong>{{ niveau|default:"Tous" }}</strong>
+</p>
+
+{# Ligne KPI #}
+<div class="row g-3 mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Effectif</div>
+        <div class="kpi-value text-primary">{{ total_etudiants|default:"0" }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Taux de réussite</div>
+        <div class="kpi-value text-success">{{ taux_reussite|default:"—" }}<span class="fs-5"> %</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Risque élevé</div>
+        <div class="kpi-value text-danger">{{ nb_risque_eleve|default:"0" }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body">
+        <div class="kpi-label">Redoublements</div>
+        <div class="kpi-value text-warning">{{ nb_redoublements|default:"0" }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  {# Distribution (bar chart) #}
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="section-title"><i class="bi bi-bar-chart me-2"></i>Distribution des risques</h2>
+        <canvas id="chartDistribution" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+
+  {# Alertes récentes #}
+  <div class="col-lg-7">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="section-title"><i class="bi bi-bell me-2"></i>Alertes récentes</h2>
+        {% for a in alertes_recentes %}
+          <div class="alert-card {{ a.niveau_risque|lower }}">
+            <div class="d-flex justify-content-between">
+              <strong>
+                <code>{{ a.etudiant.matricule }}</code>
+                {{ a.etudiant.utilisateur.get_full_name|default:"" }}
+              </strong>
+              <small class="text-muted">{{ a.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            <p class="mb-0 mt-1 small">
+              <span class="badge bg-secondary">{{ a.get_type_display|default:a.type }}</span>
+              {{ a.message|default:"—" }}
+            </p>
+          </div>
+        {% empty %}
+          <p class="text-muted mb-0"><i class="bi bi-check-circle me-1"></i>Aucune alerte récente.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# UE critiques #}
+<div class="card shadow-sm mt-3">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-exclamation-triangle me-2"></i>UE critiques</h2>
+    <div class="table-responsive">
+      <table class="table table-sm table-striped" id="tableUE">
+        <thead>
+          <tr>
+            <th>Code</th><th>Intitulé</th><th>Effectif</th>
+            <th>Échecs</th><th>Taux échec</th><th>Moyenne</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ue in ue_critiques %}
+            <tr>
+              <td><code>{{ ue.code }}</code></td>
+              <td>{{ ue.intitule|default:"—" }}</td>
+              <td>{{ ue.effectif|default:"0" }}</td>
+              <td><span class="text-danger fw-bold">{{ ue.echecs|default:"0" }}</span></td>
+              <td>{{ ue.taux_echec|default:"0" }} %</td>
+              <td>{{ ue.moyenne|default:"—" }}/20</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">Aucune UE critique.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  initDataTable('#tableUE', { paging: false, order: [[4, 'desc']] });
+
+  new Chart(document.getElementById('chartDistribution'), {
+    type: 'bar',
+    data: {
+      labels: ['Faible', 'Modéré', 'Élevé'],
+      datasets: [{
+        label: 'Nombre d\'étudiants',
+        data: [{{ distribution.Faible|default:0 }}, {{ distribution.Modere|default:0 }}, {{ distribution.Eleve|default:0 }}],
+        backgroundColor: ['#38a169', '#d69e2e', '#c53030']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+});
+</script>
+{% endblock %}

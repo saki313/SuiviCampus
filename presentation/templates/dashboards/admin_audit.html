@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Journal d'audit — Administration{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Journal d'audit</h1>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <table class="table table-striped" id="tableAudit">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Utilisateur</th>
+          <th>Action</th>
+          <th>Chemin</th>
+          <th>Adresse IP</th>
+          <th>Statut</th>
+          <th>Détail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr>
+            <td data-order="{{ log.created_at|date:"U" }}">{{ log.created_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ log.utilisateur|default:"—" }}</td>
+            <td><code>{{ log.action|default:"—" }}</code></td>
+            <td><small>{{ log.chemin|default:"—" }}</small></td>
+            <td>{{ log.adresse_ip|default:"—" }}</td>
+            <td>
+              {% if log.statut %}
+                <span class="badge {% if log.statut < 300 %}bg-success{% elif log.statut < 400 %}bg-info{% elif log.statut < 500 %}bg-warning{% else %}bg-danger{% endif %}">
+                  {{ log.statut }}
+                </span>
+              {% else %}—{% endif %}
+            </td>
+            <td><small class="text-muted">{{ log.detail|default:"—" }}</small></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center text-muted">Aucune entrée dans le journal.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () { initDataTable('#tableAudit', { order: [[0, 'desc']], pageLength: 50 }); });
+</script>
+{% endblock %}

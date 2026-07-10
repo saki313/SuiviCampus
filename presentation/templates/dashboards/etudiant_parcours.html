@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Mon parcours — {{ etudiant.matricule }}{% endblock %}
+
+{% block content %}
+{# Carte d'identité étudiant #}
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 mb-1">
+          <i class="bi bi-diagram-3 text-primary me-2"></i>
+          Parcours académique
+        </h1>
+        <p class="text-muted mb-0">
+          {{ etudiant.utilisateur.get_full_name|default:etudiant.matricule }}
+        </p>
+      </div>
+      <div class="text-end">
+        <span class="badge bg-secondary me-1">{{ etudiant.matricule }}</span>
+        <span class="badge bg-info">{{ etudiant.niveau }} — {{ etudiant.filiere|default:"—" }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Tableau des résultats #}
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-list-check me-2"></i>Résultats par UE</h2>
+    <table class="table table-striped" id="tableResultats">
+      <thead>
+        <tr>
+          <th>UE</th>
+          <th>Intitulé</th>
+          <th>Note</th>
+          <th>Crédits</th>
+          <th>Validé</th>
+          <th>Semestre</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in resultats %}
+          <tr>
+            <td><code>{{ r.ue.code }}</code></td>
+            <td>{{ r.ue.intitule }}</td>
+            <td>
+              {% if r.valide %}{{ r.note|default:"—" }}/20{% else %}
+                <span class="text-danger fw-bold">{{ r.note|default:"—" }}/20</span>
+              {% endif %}
+            </td>
+            <td>{{ r.credits|default:"0" }}</td>
+            <td>
+              {% if r.valide %}
+                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Oui</span>
+              {% else %}
+                <span class="badge bg-danger"><i class="bi bi-x-lg"></i> Non</span>
+              {% endif %}
+            </td>
+            <td>{{ r.semestre|default:"—" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted">Aucun résultat enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# Snapshots historiques #}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h2 class="section-title"><i class="bi bi-clock-history me-2"></i>Snapshots historiques</h2>
+    {% for h in historique %}
+      <div class="card mb-2 border-start border-4 {% if h.ues_echec %}border-warning{% else %}border-success{% endif %}">
+        <div class="card-body py-2">
+          <div class="d-flex flex-wrap justify-content-between">
+            <strong>{{ h.semestre|default:"—" }}</strong>
+            <span class="text-muted small">UE en échec : {{ h.ues_echec|default:"0" }}</span>
+          </div>
+          <div class="row text-center mt-2 small">
+            <div class="col">
+              <span class="text-muted d-block">Moyenne</span>
+              <strong>{{ h.moyenne_generale|default:"—" }}/20</strong>
+            </div>
+            <div class="col">
+              <span class="text-muted d-block">Crédits</span>
+              <strong>{{ h.credits_acquis|default:"0" }}/{{ h.credits_total|default:"0" }}</strong>
+            </div>
+            <div class="col">
+              <span class="text-muted d-block">UE total</span>
+              <strong>{{ h.ues_total|default:"0" }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Aucun snapshot historique disponible.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () { initDataTable('#tableResultats', { order: [[5, 'desc']] }); });
+</script>
+{% endblock %}

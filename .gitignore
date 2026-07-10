@@ -1,0 +1,69 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+
+# --- Environnements virtuels ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Variables d'environnement (NE JAMAIS committer) ---
+.env
+.env.local
+.env.*.local
+
+# --- Base de données ---
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# --- Django ---
+local_settings.py
+media/
+staticfiles/
+
+# --- Outils de test / couverture ---
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# --- Linting / formatage ---
+.flake8
+.mypy_cache/
+.ruff_cache/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# --- Logs ---
+*.log
+logs/
+*.pid
+
+# --- Docker volumes (locales si bind) ---
+pgdata/
+
+# --- Build artifacts ---
+*.DS_Store
