@@ -86,6 +86,13 @@ class TestAuthentification:
         assert resp.status_code == 302
         assert "/login/" in resp.url
 
+    def test_dashboard_sans_auth_utilise_la_page_login_du_projet(self, client_web):
+        """La redirection doit pointer vers /login/ et non vers /accounts/login/."""
+        resp = client_web.get(reverse("dashboards:etudiant"))
+        assert resp.status_code == 302
+        assert resp.url.startswith("/login/")
+        assert "/accounts/login/" not in resp.url
+
 
 class TestDashboardsParRole:
     """Tests des dashboards selon le rôle."""

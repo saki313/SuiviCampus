@@ -6,9 +6,11 @@
   /api/docs/       → Swagger UI (drf-spectacular)
   /api/schema/     → schéma OpenAPI brut
 """
+# Charge le site admin personnalisé
+import config.admin_config  # noqa: F401
+
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import RedirectView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
@@ -16,9 +18,6 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    # Racine → redirection vers le tableau de bord (rôle-dépendant)
-    path("", RedirectView.as_view(url="/tableau-de-bord/", permanent=False), name="home"),
-
     # Interface web (presentation layer) — incluse AVANT admin.site.urls car
     # les URLs dashboards admin sont préfixées /admin/ (ex: /admin/etl/).
     # Django résout les URLs dans l'ordre : dashboards doit être testé en premier.

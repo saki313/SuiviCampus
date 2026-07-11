@@ -13,9 +13,14 @@ urlpatterns = [
     # Auth
     path("login/", views_auth.login_view, name="login"),
     path("logout/", views_auth.logout_view, name="logout"),
-    path("", views_auth.accueil, name="accueil"),
+    
+    # Accueil public (pas besoin d'être authentifié)
+    path("", views_auth.home_view, name="accueil"),
+    
+    # Redirection par rôle (pour utilisateurs authentifiés)
+    path("dashboard/", views_auth.accueil, name="dashboard"),
 
-    # Tableau de bord Étudiant
+    # Tableau de bord Étudiant (accès direct si login)
     path("tableau-de-bord/", views_etudiant.dashboard_etudiant, name="etudiant"),
     path("mon-parcours/", views_etudiant.parcours_etudiant, name="etudiant_parcours"),
     path("mes-alertes/", views_etudiant.alertes_etudiant, name="etudiant_alertes"),

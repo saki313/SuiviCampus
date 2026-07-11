@@ -90,6 +90,18 @@ body {
 table.dataTable thead th { font-size: 0.85rem; }
 table.dataTable tbody td { font-size: 0.9rem; }
 
+/* Graphiques dashboard */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    height: 320px;
+}
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* Étiquette projection diplomation */
 .projection-date {
     font-family: monospace;

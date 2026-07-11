@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 
     # Tiers
     "rest_framework",
@@ -118,6 +119,18 @@ if DATABASES["default"].get("ENGINE") == "django.db.backends.postgresql":
 
 # --- Authentification : modèle Utilisateur personnalisée ----------------------
 AUTH_USER_MODEL = "accounts.Utilisateur"
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"  # Redirige vers /dashboard/ → _redirect_par_role()
+
+# --- Configuration du site Django admin -----------------------------------------------
+# Site ID pour Django (utilisé par django.contrib.sites)
+SITE_ID = 1
+
+# Les éléments suivants sont utilisés par config/admin_config.py
+ADMIN_URL_BASE = "/admin/"
+ADMIN_SITE_HEADER = "Suivi Académique — Administration"
+ADMIN_SITE_TITLE = "Suivi Académique"
+ADMIN_INDEX_TITLE = "Gestion du système"
 
 # --- Internationalisation -----------------------------------------------------
 LANGUAGE_CODE = "fr-fr"

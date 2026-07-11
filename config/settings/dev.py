@@ -25,3 +25,11 @@ if config("DJANGO_LOG_SQL", default=False, cast=bool):
         "level": "DEBUG",
         "propagate": False,
     }
+
+# Base de données SQLite pour le développement
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}

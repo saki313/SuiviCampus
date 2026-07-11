@@ -10,6 +10,17 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 
+def home_view(request):
+    """Page d'accueil publique (pas besoin d'être authentifié).
+    
+    Si l'utilisateur est déjà connecté, redirige vers son dashboard.
+    Sinon, affiche la page d'accueil avec lien vers connexion.
+    """
+    if request.user.is_authenticated:
+        return _redirect_par_role(request.user)
+    return render(request, "home.html")
+
+
 @require_http_methods(["GET", "POST"])
 def login_view(request):
     """Connexion à l'interface web (session)."""

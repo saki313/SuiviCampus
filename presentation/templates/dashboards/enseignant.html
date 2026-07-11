@@ -45,9 +45,13 @@
   {# Distribution (donut) #}
   <div class="col-lg-5">
     <div class="card shadow-sm h-100">
-      <div class="card-body">
+      <div class="card-body d-flex flex-column">
         <h2 class="section-title"><i class="bi bi-pie-chart me-2"></i>Distribution des risques</h2>
-        <canvas id="chartDistribution" height="260"></canvas>
+        <div class="chart-wrapper flex-grow-1">
+          <canvas id="chartDistribution"
+                  data-labels='["Faible","Modéré","Élevé"]'
+                  data-values='[{{ distribution.Faible|default:0 }}, {{ distribution.Modere|default:0 }}, {{ distribution.Eleve|default:0 }}]'></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -92,12 +96,16 @@
 $(function () {
   initDataTable('#tableUE', { paging: false, order: [[4, 'desc']] });
 
-  new Chart(document.getElementById('chartDistribution'), {
+  const chartCanvas = document.getElementById('chartDistribution');
+  const chartLabels = chartCanvas.dataset.labels ? JSON.parse(chartCanvas.dataset.labels) : ['Faible', 'Modéré', 'Élevé'];
+  const chartValues = chartCanvas.dataset.values ? JSON.parse(chartCanvas.dataset.values) : [0, 0, 0];
+
+  new Chart(chartCanvas, {
     type: 'doughnut',
     data: {
-      labels: ['Faible', 'Modéré', 'Élevé'],
+      labels: chartLabels,
       datasets: [{
-        data: [{{ distribution.Faible|default:0 }}, {{ distribution.Modere|default:0 }}, {{ distribution.Eleve|default:0 }}],
+        data: chartValues,
         backgroundColor: ['#38a169', '#d69e2e', '#c53030']
       }]
     },

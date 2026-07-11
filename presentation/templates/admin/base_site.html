@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+
+{% block nav-global %}
+    <div style="background-color: #417690; padding: 10px; margin-bottom: 10px;">
+        <a href="/" style="color: white; font-weight: bold; text-decoration: none; display: inline-block; padding: 8px 15px; background-color: #205067; border-radius: 4px;">
+            ← Retour au site
+        </a>
+    </div>
+    {{ block.super }}
+{% endblock %}

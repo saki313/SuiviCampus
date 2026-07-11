@@ -37,7 +37,7 @@
             <td><small class="text-muted">{{ log.detail|default:"—" }}</small></td>
           </tr>
         {% empty %}
-          <tr><td colspan="7" class="text-center text-muted">Aucune entrée dans le journal.</td></tr>
+          <tr><td class="text-center text-muted" colspan="7">Aucune entrée dans le journal.</td></tr>
         {% endfor %}
       </tbody>
     </table>
