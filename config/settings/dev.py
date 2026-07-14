@@ -18,14 +18,6 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "suivi-academique@localhost"
 
-# Affichage SQL en console si demandé.
-if config("DJANGO_LOG_SQL", default=False, cast=bool):
-    LOGGING["loggers"]["django.db.backends"] = {
-        "handlers": ["console"],
-        "level": "DEBUG",
-        "propagate": False,
-    }
-
 # Base de données SQLite pour le développement
 DATABASES = {
     "default": {
@@ -33,3 +25,49 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# Backend d'authentification avec traces
+AUTHENTICATION_BACKENDS = [
+    'apps.accounts.backends.TraceBackend',
+]
+
+# Logs pour tracer l'authentification
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} :: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'auth_trace.log',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django.contrib.auth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'apps.dashboards.views_auth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
+}
+
+# Affichage SQL en console si demandé.
+if config("DJANGO_LOG_SQL", default=False, cast=bool):
+    LOGGING["loggers"]["django.db.backends"] = {
+        "handlers": ["console"],
+        "level": "DEBUG",
+        "propagate": False,
+    }

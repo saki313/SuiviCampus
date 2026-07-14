@@ -27,7 +27,7 @@
       <div class="card-body">
         <div class="kpi-label">Score de risque</div>
         <div class="kpi-value text-primary">
-          <span id="kpiScore">{{ score|default:"—" }}</span><span class="fs-5">/100</span>
+          <span id="kpiScore">{{ score|floatformat:2|default:"—" }}</span><span class="fs-5">/100</span>
         </div>
         <div id="kpiRisqueBadge" class="mt-1"></div>
       </div>
@@ -39,7 +39,7 @@
     <div class="card kpi-card h-100">
       <div class="card-body">
         <div class="kpi-label">Progression</div>
-        <div class="kpi-value text-success">{{ indicateurs.taux_progression|default:"—" }}<span class="fs-5"> %</span></div>
+        <div class="kpi-value text-success">{{ indicateurs.taux_progression|floatformat:2|default:"—" }}<span class="fs-5"> %</span></div>
         <small class="text-muted">Crédits / curriculum</small>
       </div>
     </div>
@@ -69,9 +69,9 @@
       <div class="card-body">
         <div class="kpi-label">Moyenne générale</div>
         <div class="kpi-value text-info">
-          {{ indicateurs.moyenne_generale|default:"—" }}<span class="fs-5">/20</span>
+          {{ indicateurs.moyenne_generale|floatformat:2|default:"—" }}<span class="fs-5">/20</span>
         </div>
-        <small class="text-muted">Absentéisme : {{ indicateurs.taux_absenteisme|default:"—" }} %</small>
+        <small class="text-muted">Absentéisme : {{ indicateurs.taux_absenteisme|floatformat:2|default:"—" }} %</small>
       </div>
     </div>
   </div>
@@ -91,7 +91,7 @@
       </div>
       <div class="col-md-6">
         <p class="mb-1 text-muted">Semestres restants estimés</p>
-        <p class="h4 mb-0">{{ indicateur_obj.semestres_restants|default:"—" }}</p>
+        <p class="h4 mb-0">{{ indicateur_obj.semestres_restants|floatformat:0|default:"—" }}</p>
       </div>
     </div>
   </div>

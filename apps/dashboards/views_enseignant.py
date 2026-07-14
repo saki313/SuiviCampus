@@ -141,6 +141,7 @@ def dashboard_responsable(request):
     ).distinct().count()
 
     context = {
+        "user": user,
         "filiere": filiere_filter,
         "niveau": niveau_filter,
         "total_etudiants": total,

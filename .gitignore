@@ -22,6 +22,7 @@ venv.bak/
 .env
 .env.local
 .env.*.local
+.envrc
 
 # --- Base de données ---
 *.sqlite3
@@ -44,6 +45,26 @@ coverage.xml
 *.cover
 .hypothesis/
 
+# --- Rapports générés ---
+rapport_*.html
+rapport_*.txt
+rapport_*.tex
+perf_output.txt
+
+# --- Logs ---
+*.log
+logs/
+*.pid
+auth_trace.log
+
+# --- Archives ---
+*.zip
+*.tar.gz
+*.tar
+*.gz
+*.7z
+*.rar
+
 # --- Linting / formatage ---
 .flake8
 .mypy_cache/
@@ -57,13 +78,8 @@ coverage.xml
 *~
 .DS_Store
 
-# --- Logs ---
-*.log
-logs/
-*.pid
-
-# --- Docker volumes (locales si bind) ---
+# --- Docker ---
 pgdata/
 
-# --- Build artifacts ---
-*.DS_Store
+# --- Système ---
+Thumbs.db

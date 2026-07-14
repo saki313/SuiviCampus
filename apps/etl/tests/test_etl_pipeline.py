@@ -5,7 +5,7 @@ l'OLTP et le Data Warehouse (schéma en étoile).
 """
 import pytest
 
-from apps.etl.clients.mock import MockCampusFasoClient
+from apps.etl.clients.mock import MockCampusFasoClient, CATALOGUE_UE
 from apps.etl.services.pipeline import EtlPipeline, executer_etl
 from apps.etl.models import EtlRun, EtlCheckpoint
 from apps.accounts.models import ProfilEtudiant
@@ -36,10 +36,10 @@ class TestPipelineChargement:
         assert run.date_fin is not None
 
     def test_chargement_ues(self, petit_mock):
-        """Le pipeline doit charger les 12 UE."""
+        """Le pipeline doit charger toutes les UE du catalogue (24 = L1+L2+L3)."""
         pipeline = EtlPipeline(client=petit_mock)
         pipeline.executer(differentiel=False)
-        assert UniteEnseignement.objects.count() == 12
+        assert UniteEnseignement.objects.count() == len(CATALOGUE_UE)
 
     def test_chargement_etudiants(self, petit_mock):
         """Le pipeline doit charger les 5 étudiants."""
@@ -71,10 +71,10 @@ class TestChargementDataWarehouse:
         assert DimEtudiant.objects.count() == 5
 
     def test_dim_ue_alimentee(self, petit_mock):
-        """DimUE doit être alimentée."""
+        """DimUE doit être alimentée avec toutes les UE du catalogue."""
         pipeline = EtlPipeline(client=petit_mock)
         pipeline.executer(differentiel=False)
-        assert DimUE.objects.count() == 12
+        assert DimUE.objects.count() == len(CATALOGUE_UE)
 
     def test_fait_resultats_alimente(self, petit_mock):
         """FaitResultats doit être alimentée."""

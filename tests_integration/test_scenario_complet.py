@@ -10,7 +10,7 @@ Ce test valide que toutes les couches communiquent correctement.
 """
 import pytest
 
-from apps.etl.clients.mock import MockCampusFasoClient
+from apps.etl.clients.mock import MockCampusFasoClient, CATALOGUE_UE
 from apps.etl.services.pipeline import EtlPipeline
 from apps.etl.models import EtlRun
 from apps.accounts.models import ProfilEtudiant
@@ -40,13 +40,13 @@ class TestScenarioComplet:
 
         # OLTP
         assert ProfilEtudiant.objects.count() == 15
-        assert UniteEnseignement.objects.count() == 12
+        assert UniteEnseignement.objects.count() == len(CATALOGUE_UE)
         assert ResultatAcademique.objects.count() > 0
         assert Presence.objects.count() > 0
 
         # DW (schéma en étoile)
         assert DimEtudiant.objects.count() == 15
-        assert DimUE.objects.count() == 12
+        assert DimUE.objects.count() == len(CATALOGUE_UE)
         assert DimSemestre.objects.count() > 0
         assert FaitResultats.objects.count() > 0
 

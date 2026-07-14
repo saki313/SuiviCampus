@@ -3,7 +3,11 @@
 {% block title %}Tableau de bord enseignant{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4"><i class="bi bi-speedometer2 text-primary me-2"></i>Tableau de bord enseignant</h1>
+{% if user.role == 'enseignant'%}
+  <h1 class="h3 mb-4"><i class="bi bi-speedometer2 text-primary me-2"></i>Tableau de bord enseignant</h1>
+{%else%}
+  <h1 class="h3 mb-4"><i class="bi bi-speedometer2 text-primary me-2"></i>Tableau de bord responsable</h1>
+{%endif%}
 
 {# Ligne KPI #}
 <div class="row g-3 mb-4">

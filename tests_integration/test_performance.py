@@ -85,13 +85,12 @@ class TestPerformanceServices:
     """Mesure le temps d'exécution des services critiques (Eq 2.1/2.2)."""
 
     def test_recalcul_kpi_promotion_rapide(self, dataset_charge):
-        """Recalcul complet des indicateurs d'une promotion (85 étudiants).
-
-        Doit rester sous le seuil du cahier des charges (< 3 s).
-        """
         start = time.perf_counter()
         nb = calculer_indicateurs_promotion()
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Recalcul KPI promotion ({nb} étudiants) & "
+              f"< {SEUIL_REQUETE_MS/1000:.0f}~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert nb == 85
         assert elapsed < SEUIL_REQUETE_MS, (
@@ -99,10 +98,12 @@ class TestPerformanceServices:
         )
 
     def test_distribution_scores_rapide(self, dataset_charge):
-        """Distribution agrégée par classification (1 requête SQL)."""
         start = time.perf_counter()
         dist = get_distribution_scores()
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Distribution des scores (agrégation SQL) & "
+              f"< 1~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert sum(dist.values()) > 0
         assert elapsed < 1000, (
@@ -110,10 +111,12 @@ class TestPerformanceServices:
         )
 
     def test_ue_critiques_rapide(self, dataset_charge):
-        """Identification des UE critiques (agrégation SQL)."""
         start = time.perf_counter()
         ues = get_ue_critiques(limite=10)
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Identification des UE critiques & "
+              f"< 1~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert len(ues) > 0
         assert elapsed < 1000, (
@@ -121,12 +124,13 @@ class TestPerformanceServices:
         )
 
     def test_scores_promotion_avec_indicateurs(self, dataset_charge):
-        """Le QuerySet scores_promotion doit rester léger (lazy)."""
         start = time.perf_counter()
         qs = get_scores_promotion()
-        # Forcer l'évaluation complète (select_related + filtre)
         liste = list(qs)
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Scores promotion avec indicateurs & "
+              f"< 1,5~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert len(liste) > 0
         assert elapsed < 1500, (
@@ -134,15 +138,18 @@ class TestPerformanceServices:
         )
 
     def test_calcul_indicateur_etudiant_rapide(self, dataset_charge):
-        """Calcul d'UN étudiant doit être instantané (< 200 ms)."""
         etudiant = ProfilEtudiant.objects.first()
         start = time.perf_counter()
         calculer_indicateurs_etudiant(etudiant)
         elapsed = _elapsed_ms(start)
 
+        print(f"%LATEXROW% Calcul indicateur (1 étudiant) & "
+              f"< 0,2~s & {elapsed/1000:.3f}~s & PASSED \\\\")
+
         assert elapsed < 200, (
             f"Calcul 1 étudiant trop lent : {elapsed:.0f} ms"
         )
+
 
 
 # ---------------------------------------------------------------------------
@@ -153,11 +160,13 @@ class TestPerformanceRapports:
     """Génération PDF/Excel/CSV — doit respecter le seuil de 3 s."""
 
     def test_rapport_csv_rapide(self, dataset_charge):
-        """Export CSV complet de la promotion."""
         start = time.perf_counter()
         buffer = exporter_csv()
         elapsed = _elapsed_ms(start)
         contenu = buffer.getvalue()
+
+        print(f"%LATEXROW% Génération rapport CSV & "
+              f"< {SEUIL_REQUETE_MS/1000:.0f}~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert len(contenu) > 0
         assert elapsed < SEUIL_REQUETE_MS, (
@@ -165,10 +174,12 @@ class TestPerformanceRapports:
         )
 
     def test_rapport_excel_rapide(self, dataset_charge):
-        """Export Excel complet (3 feuilles)."""
         start = time.perf_counter()
         buffer = exporter_excel()
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Génération rapport Excel & "
+              f"< {SEUIL_REQUETE_MS/1000:.0f}~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert len(buffer.getvalue()) > 0
         assert elapsed < SEUIL_REQUETE_MS, (
@@ -176,10 +187,12 @@ class TestPerformanceRapports:
         )
 
     def test_rapport_pdf_rapide(self, dataset_charge):
-        """Génération du PDF de synthèse."""
         start = time.perf_counter()
         buffer = exporter_pdf()
         elapsed = _elapsed_ms(start)
+
+        print(f"%LATEXROW% Génération rapport PDF & "
+              f"< {SEUIL_REQUETE_MS/1000:.0f}~s & {elapsed/1000:.2f}~s & PASSED \\\\")
 
         assert len(buffer.getvalue()) > 0
         assert elapsed < SEUIL_REQUETE_MS, (
